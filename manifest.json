@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+
+  "name": "HoverTweet",
+  "description": "This extension shows the contents of a Tweet by hovering over a link to said Tweet. Similar to HoverZoom, but for Tweets instead of images.",
+  "version": "1.0",
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["jquery-2.1.3.min.js", "hovertweet.js"]
+    }
+  ],
+
+
+
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "webRequestBlocking"
+  ]
+}
