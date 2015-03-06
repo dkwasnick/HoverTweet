@@ -5,7 +5,8 @@
   "description": "This extension shows the contents of a Tweet by hovering over a link to said Tweet. Similar to HoverZoom, but for Tweets instead of images.",
   "version": "1.0",
 
-  "icons": {"128":"icon128.png"},
+  "icons": {"128":"icon128.png",
+            "48":"icon48.png"},
 
 
   "content_scripts": [
@@ -20,6 +21,7 @@
   "permissions": [
     "activeTab",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "https://*.twitter.com/*"
   ]
 }
