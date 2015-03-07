@@ -4,11 +4,32 @@ var hoverTweetPos;
 var boxWidth = 400;
 var loadedTweets = new Map();
 
+var modKey = 17;
+var modPressed = false;
+
 
 $(document).ready(initializeHoverTweet);
 
 
+$(document).keydown(function(e) {
+	if (e.which == modKey)
+	{
+		modPressed = true;
+	}
+});
+
+$(document).keyup(function(e) {
+	if (e.which == modKey)
+	{
+		modPressed = false;
+	}
+});
+
 $(document).bind('mousemove', function(e) {
+	if (modPressed)
+	{
+		return;
+	}
 	var target = $(e.target);
     if (target.is("a")) {
 
@@ -21,7 +42,6 @@ $(document).bind('mousemove', function(e) {
     		// not a twitter url
     		return;
     	}
-
 
     	initializeHoverTweet();
 
@@ -41,7 +61,10 @@ $(document).bind('mousemove', function(e) {
 
 
 		target.bind('mouseout', function(ev) {
-        	hoverTweet.hide();
+			if (!modPressed)
+			{
+				hoverTweet.hide();
+			}
         });
 
         
@@ -56,6 +79,7 @@ $(document).bind('mousemove', function(e) {
 			populateHoverTweet(tweetInfo);
 		}else{
 
+			
 			loadedTweets.set(tweetUrl,"Loading...");
 			
 			$.ajax({
@@ -64,64 +88,27 @@ $(document).bind('mousemove', function(e) {
 		       dataType: "text",
 		       success: function(data) {
 
-					/*
-					Possible alternate source for populating tweet contents
-					<meta  property="og:type" content="article">
-			        <meta  property="og:url" content="https://twitter.com/Matt_Barnes22/status/572993563673415680">
-			        <meta  property="og:title" content="Matt Barnes on Twitter">
-			        <meta  property="og:image" content="https://pbs.twimg.com/profile_images/495822736812290048/yX_yk8KZ_400x400.jpeg">
-			        <meta  property="og:description" content="“Check this dope 2pac piece out by @keenanchapman make sure you check him out! Wats your favorite pac… https://t.co/MWF939NcmU”">
-			        <meta  property="og:site_name" content="Twitter">
-			        <meta  property="fb:app_id" content="2231777543">
-			        */
 
-					var beforeUsername = "https://twitter.com/";
-					var usernameStart = beforeUsername.length;
-					var usernameEnd = tweetUrl.indexOf("/",usernameStart);
-					var username = tweetUrl.substring(usernameStart,usernameEnd);
+		       		markLinkVisited(target);
+
+					var username = extractInterior(tweetUrl,"https://twitter.com/","/");
 
 					//console.log("Username: "+username);
 
-
-					var messageSearchString = 'data-aria-label-part="0">';
-					var messageStart = data.indexOf(messageSearchString)+messageSearchString.length;
-					var messageToEnd = data.substring(messageStart);
-					var messageEnd = messageToEnd.indexOf('</p>');
-					var message = messageToEnd.substring(0,messageEnd);
+					var message = extractInterior(data,'data-aria-label-part="0">','</p>');
 
 					//console.log("Message: "+message);
 
 
+		        	var fullName = extractInterior(data,"<title>"," on Twitter");
 
-
-		        	var titleStart = data.search("<title>")+7;
-		        	var titleEnd = data.search("</title>");
-		        	var title = data.substring(titleStart,titleEnd);
-
-
-		        	var fullNameEnd = title.indexOf(" on Twitter");
-		        	var fullName = title.substring(0,fullNameEnd);
 
 		        	//console.log("Full Name: "+fullName);
 
-		        	var newmessageSearchString = "on Twitter: &quot;";
-		        	var newmessageStart = title.indexOf(newmessageSearchString)+newmessageSearchString.length;
-		        	var newmessageEnd = title.lastIndexOf("&quot;");
-		        	var newmessage = title.substring(newmessageStart,newmessageEnd);
 
-		        	//console.log("Backup Message: "+newmessage);
-
-		        	var imageSearchString = '<meta  property="og:image" content="';
-		        	var imageStart = data.indexOf(imageSearchString)+imageSearchString.length;
-		        	var imageEnd = data.indexOf('">',imageStart);
-		        	var imageUrl = data.substring(imageStart,imageEnd);
+		        	var imageUrl = extractInterior(data,'<meta  property="og:image" content="','">');
 
 		        	//console.log("Image URL: "+imageUrl);
-
-		        	if (messageStart < 0)
-		        	{
-		        		message = newmessage;
-		        	}
 
 
 		        	var tweetInfo = {full:fullName,un:username,msg:message,img:imageUrl};
@@ -144,16 +131,17 @@ function calculatePosition()
 	var top = mousePos.top+10;
 	var left = mousePos.left+10;
 
-	var overflow = left+boxWidth-$(window).width();
+	var hOverflow = left+boxWidth-$(window).width();
 
-	if (overflow > 0)
+	if (hOverflow > 0)
 	{
-		left -= overflow;
+		left -= hOverflow;
 		if (left < 0)
 		{
 			left = 0;
 		}
 	}
+
 
 	hoverTweetPos = {'top':top,'left':left};
 
@@ -203,7 +191,7 @@ function populateHoverTweet(tweetInfo)
 		var img_css = {'height':'50px','width':'50px','border-radius':'5px'};
 		img.css(img_css);
 
-		var fn = $('<p>'+tweetInfo.full+'</p>');
+		var fn = $('<a href="https://twitter.com/'+tweetInfo.un+'" target="_blank">'+tweetInfo.full+'</a>');
 		var fn_css = {'color':'#292f33','font-weight':'bold','font-size':'20px'};
 		fn.css(fn_css);
 
@@ -224,8 +212,24 @@ function populateHoverTweet(tweetInfo)
 		hoverTweet.append(namesDiv);
 		hoverTweet.append(msg);
 	}
-	
-	
+}
+
+// Doesn't last beyond current view of page. Need alternate solution to preserve between refreshes/reloads.
+function markLinkVisited(link)
+{
+	link.addClass('visited');
+}
 
 
+// extracts and returns the string between beforeString and afterString from dataString
+// for example:
+// dataString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+// beforeString = "JKLMN"
+// afterString = "STUVW"
+// returns "OPQR"
+function extractInterior(dataString, beforeString, afterString)
+{
+	var beforePosition = dataString.indexOf(beforeString)+beforeString.length;
+	var afterPosition = dataString.indexOf(afterString,beforePosition);
+	return dataString.substring(beforePosition,afterPosition);
 }

@@ -8,3 +8,4 @@ Potential updates:
 • Show date/time of tweets
 • Show comments/retweets/favorites of tweets
 • Mark links as visited once you've hovered over them
+• Options/settings page to change font size, window size, etc

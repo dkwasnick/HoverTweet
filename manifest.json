@@ -3,7 +3,7 @@
 
   "name": "HoverTweet",
   "description": "This extension shows the contents of a Tweet when hovering over a link to a Tweet.",
-  "version": "1.0",
+  "version": "1.1",
 
   "icons": {"128":"icon128.png",
             "48":"icon48.png"},
