@@ -99,12 +99,9 @@ $(document).bind('mousemove', function(e) {
 
 					//console.log("Message: "+message);
 
-
-		        	var fullName = extractInterior(data,"<title>"," on Twitter");
-
+		        	var fullName = extractInterior(data,'data-screen-name="'+username+'" data-name="','"');
 
 		        	//console.log("Full Name: "+fullName);
-
 
 		        	var imageUrl = extractInterior(data,'<meta  property="og:image" content="','">');
 
