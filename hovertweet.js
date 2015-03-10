@@ -34,7 +34,7 @@ $(document).bind('mousemove', function(e) {
     if (target.is("a")) {
 
     	var tweetUrl = target.attr('href');
-    	if (tweetUrl.match("http(s){0,1}://((m.)|(mobile.)|(www.))?twitter.com/.*/status/\d*"))
+    	if (tweetUrl.match("http(s){0,1}://((m.)|(mobile.)|(www.))?twitter.com/.*/status(es)?/\d*"))
     	{
     		//trim www or m or mobile, make sure it's https
     		tweetUrl = "https://"+tweetUrl.substring(tweetUrl.search("twitter.com"));
