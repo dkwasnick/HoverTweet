@@ -197,7 +197,9 @@ function populateHoverTweet(tweetInfo)
 		un.css(un_css);
 
 		var msg = $('<p>'+tweetInfo.msg+'</p>');
-		var msg_css = {'color':'#292f33','font-size':'18px','float':'left'};
+		var msg_css = {'color':'#292f33','font-size':'18px','float':'left','-ms-word-break':'break-all','word-break':'break-all','word-break':'break-word','-webkit-hyphens':'auto','-moz-hyphens':'auto','hyphens':'auto'};
+
+
 		msg.css(msg_css);
 
 
